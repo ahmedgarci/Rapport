@@ -5,6 +5,8 @@ use App\Repository\AdminRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -14,18 +16,18 @@ class AuthController extends AbstractController
      * @Route("/auth", name="app_auth")
      */
     public function index(
+        Request $request,
         EntityManagerInterface $em,
         AdminRepository $adminRepository,
         SerializerInterface $serializer
     ): JsonResponse
     {
-        $admins = $adminRepository->findAll();
-        $serializedAdmins = $serializer->serialize($admins, 'json');
+        $userInfo = $request->getContent();
+        // $admins = $adminRepository->findAll();
+        //$serializedAdmins = $serializer->serialize($admins, 'json');
+         $result =  Helpers::class->SearchUser($userInfo->email);
+        return new JsonResponse($userInfo, json: true);
 
-        return new JsonResponse($serializedAdmins, json: true);
+
     }
 }
-
-/** dddddddddddddd  hazemm
- * 
- * 

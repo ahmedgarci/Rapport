@@ -35,7 +35,7 @@ class Technicien
     /**
      * @ORM\Column(type="integer")
      */
-    private $SouceDonnesId;
+
 
     public function getId(): ?int
     {
@@ -78,15 +78,7 @@ class Technicien
         return $this;
     }
 
-    public function getSouceDonnesId(): ?int
-    {
-        return $this->SouceDonnesId;
-    }
 
-    public function setSouceDonnesId(int $SouceDonnesId): self
-    {
-        $this->SouceDonnesId = $SouceDonnesId;
 
-        return $this;
-    }
+
 }
