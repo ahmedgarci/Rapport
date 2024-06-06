@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TechnicienRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +33,22 @@ class Technicien
      * @ORM\Column(type="string", length=255)
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DataSource::class, mappedBy="tech")
+     */
+    private $dataSources;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Rapports::class, mappedBy="tech")
+     */
+    private $rapports;
+
+    public function __construct()
+    {
+        $this->dataSources = new ArrayCollection();
+        $this->rapports = new ArrayCollection();
+    }
 
     /**
      * @ORM\Column(type="integer")
@@ -74,6 +92,66 @@ class Technicien
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DataSource>
+     */
+    public function getDataSources(): Collection
+    {
+        return $this->dataSources;
+    }
+
+    public function addDataSource(DataSource $dataSource): self
+    {
+        if (!$this->dataSources->contains($dataSource)) {
+            $this->dataSources[] = $dataSource;
+            $dataSource->setTech($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDataSource(DataSource $dataSource): self
+    {
+        if ($this->dataSources->removeElement($dataSource)) {
+            // set the owning side to null (unless already changed)
+            if ($dataSource->getTech() === $this) {
+                $dataSource->setTech(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rapports>
+     */
+    public function getRapports(): Collection
+    {
+        return $this->rapports;
+    }
+
+    public function addRapport(Rapports $rapport): self
+    {
+        if (!$this->rapports->contains($rapport)) {
+            $this->rapports[] = $rapport;
+            $rapport->setTech($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRapport(Rapports $rapport): self
+    {
+        if ($this->rapports->removeElement($rapport)) {
+            // set the owning side to null (unless already changed)
+            if ($rapport->getTech() === $this) {
+                $rapport->setTech(null);
+            }
+        }
 
         return $this;
     }
