@@ -61,7 +61,7 @@ class Admin implements  UserInterface
 
         return $this;
     }
-/**dddddddddddd */
+
     public function getPassword(): ?string
     {
         return $this->password;
@@ -69,7 +69,7 @@ class Admin implements  UserInterface
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+        $this->password = password_hash($password,PASSWORD_BCRYPT);
 
         return $this;
     }
