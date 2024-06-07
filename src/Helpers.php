@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Exception;
 use App\Entity\Clients;
 use App\Entity\Technicien;
 use App\Repository\AdminRepository;
@@ -56,19 +57,7 @@ class Helpers
         }
     }
 
-public function verifExitMail(String $mail , EntityManagerInterface $entityManager ):bool
-{
-    $clientRep = $entityManager->getRepository(Clients::class);
-    $technicienRep = $entityManager->getRepository(Technicien::class);
-    
-    $testclient = $clientRep->findOneBy(['email' => $mail]);
-    $testtech = $technicienRep->findOneBy(['email' => $mail]);
-    if((!$testclient) || (!$testtech)){
-        return false;
-    }else{
-        return true;
-    }
-}
+
 
 
 
