@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Exception;
 use App\Entity\Clients;
 use App\Entity\Technicien;
 use App\Repository\AdminRepository;
@@ -55,7 +56,6 @@ class Helpers
             error_log($e->getMessage());
         }
     }
-
 
 
 
