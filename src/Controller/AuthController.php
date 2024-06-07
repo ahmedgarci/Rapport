@@ -22,11 +22,9 @@ class AuthController extends AbstractController
         UserPasswordEncoderInterface $passwordEncoder,
         Request $request,
         JWTTokenManagerInterface $JWTManager,
-//        SerializerInterface $serializer,
         Helpers $helpers
     ): JsonResponse
     {
-       // $userData = $request->getContent();
         $userData = json_decode($request->getContent(), true);
         $Exists = $helpers->SearchUser($userData["email"]);
         if(!$Exists){
@@ -37,15 +35,11 @@ class AuthController extends AbstractController
             return  new JsonResponse("Invalid Credentials",JsonResponse::HTTP_UNAUTHORIZED);
         }
         $token = $JWTManager->create($Exists['user']);
-        $decodedToken = $JWTEncoder->decode($token);
-        setcookie("user",$token,3600);
-   //      $admins = $adminRepository->findAll();
-     //   $serializedAdmins = $serializer->serialize($admins, 'json');
-        //$result =  Helpers::class->SearchUser($userInfo->email);
+    //    $decodedToken = $JWTEncoder->decode($token);
 
+        setcookie("user",$token,3600);
         return new JsonResponse($Exists["type"], json: true);
 
-//        return new JsonResponse($decodedToken, json: true);
     }
 
 

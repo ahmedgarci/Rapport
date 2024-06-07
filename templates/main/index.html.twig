@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Page{% endblock %}
+
+{% block body %}
+<nav>
+<ul>
+<li><a href="{{ path('AdminMain') }}">Home</a></li>
+<li><a href="{{ path('AddClientfrom') }}">Add Clients</a></li>
+<li><a href="#">Add Technicien</a></li>
+<li><a href="#">Profile</a></li>
+<li><a href="#">LogOut</a></li>
+</ul>
+</nav>
+<h3>Clients</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+            <tr>
+                <td>{{ client.id }}</td>
+                <td>{{ client.username }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.password }}</td>
+                <td><a href=""><button>modifier</button></a></td>
+                <td><a href="{{ path('suppclient', {'id': client.id}) }}"><button>supprimer</button></a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr>
+<h3>Techniciens</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tech in techs %}
+            <tr>
+                <td>{{ tech.id }}</td>
+                <td>{{ tech.username }}</td>
+                <td>{{ tech.email }}</td>
+                <td>{{ tech.password }}</td>
+                <td><a href=""><button>modifier</button></a></td>
+                <td><a href=""><button>supprimer</button></a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

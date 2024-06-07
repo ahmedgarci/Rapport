@@ -2,9 +2,12 @@
 
 namespace App;
 
+use App\Entity\Clients;
+use App\Entity\Technicien;
 use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
 use App\Repository\TechnicienRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class Helpers
 {
@@ -20,7 +23,7 @@ class Helpers
     $this->clientsRepository = $ClientsRepository;
     $this->technicienRepository = $TechnicienRepository;
 }
-    public function SearchUser ($email)
+    public function SearchUser($email)
     {
         try {
             $isAdmin = $this->adminRepository->findOneBy(["email" => $email]);
@@ -52,4 +55,10 @@ class Helpers
             error_log($e->getMessage());
         }
     }
+
+
+
+
+
+
 }
