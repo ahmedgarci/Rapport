@@ -5,7 +5,8 @@
 {% block body %}
 <nav>
 <ul>
-<li><a href="#">Add Clients</a></li>
+<li><a href="{{ path('AdminMain') }}">Home</a></li>
+<li><a href="{{ path('AddClientfrom') }}">Add Clients</a></li>
 <li><a href="#">Add Technicien</a></li>
 <li><a href="#">Profile</a></li>
 <li><a href="#">LogOut</a></li>
@@ -18,6 +19,7 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Password</th>
         </tr>
     </thead>
     <tbody>
@@ -26,8 +28,9 @@
                 <td>{{ client.id }}</td>
                 <td>{{ client.username }}</td>
                 <td>{{ client.email }}</td>
-                <td><a><button>modifier</button></a></td>
-                    <td><a><button>supprimer</button></a></td>
+                <td>{{ client.password }}</td>
+                <td><a href=""><button>modifier</button></a></td>
+                <td><a href="{{ path('suppclient', {'id': client.id}) }}"><button>supprimer</button></a></td>
             </tr>
         {% endfor %}
     </tbody>
@@ -40,6 +43,7 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Password</th>
         </tr>
     </thead>
     <tbody>
@@ -48,8 +52,9 @@
                 <td>{{ tech.id }}</td>
                 <td>{{ tech.username }}</td>
                 <td>{{ tech.email }}</td>
-                <td><a><button>modifier</button></a></td>
-                    <td><a><button>supprimer</button></a></td>
+                <td>{{ tech.password }}</td>
+                <td><a href=""><button>modifier</button></a></td>
+                <td><a href=""><button>supprimer</button></a></td>
             </tr>
         {% endfor %}
     </tbody>

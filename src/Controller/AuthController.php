@@ -29,6 +29,5 @@ class AuthController extends AbstractController
          $result =  Helpers::class->SearchUser($userInfo->email);
         return new JsonResponse($userInfo, json: true);
 
-
     }
 }

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Page{% endblock %}
+
+{% block body %}
+<nav>
+<ul>
+<li><a href="{{ path('AdminMain') }}">Home</a></li>
+<li><a href="{{ path('AddClientfrom') }}">Add Clients</a></li>
+<li><a href="#">Add Technicien</a></li>
+<li><a href="#">Profile</a></li>
+<li><a href="#">LogOut</a></li>
+</ul>
+</nav>
+<h3>Add Clients</h3>
+<form method="post" action="{{ path('AddClient') }}">
+  <div>
+    <label>First Name</label>
+    <input type="text" name="firstname">
+  </div>
+  <br>
+  <div>
+    <label>Last Name</label>
+    <input type="text" name="lastname">
+  </div>
+  <br>
+  <div>
+    <label>Email</label>
+    <input type="email" name="email">
+  </div>
+  <br>
+  <div>
+    <label>PassWord</label>
+    <input type="Password" name="password">
+  </div>
+  <br>
+
+  {% if error is defined %}
+  <div>{{ error }}</div>
+{% endif %}
+
+  <br>
+  <br>
+  <button type="submit">Register</button>
+  <a href="{{path('AdminMain')}}"><button>cancel</button></a>
+</form>
+
+{% endblock %}
