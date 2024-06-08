@@ -41,8 +41,7 @@ class AdminProfileController extends AbstractController
             $entityManager->persist($admin);
             $entityManager->flush();
             return $this->redirectToRoute('AdminProfile');
-        return $this->render('main/Profile.html.twig');
     }
 
-
+//hedhom yestanew f lauth bch y5dmmo be l'id ta3 ladmin li connectee
 }
