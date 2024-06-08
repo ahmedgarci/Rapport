@@ -9,33 +9,47 @@ use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
 use App\Repository\TechnicienRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 class MainController extends AbstractController
 {
     /**
-     * @Route("/admin", name="AdminMain")
+     * @Route("/Admin", name="AdminMain",methods={"GET"})
      */
-    public function index(ClientsRepository $clientsRep , TechnicienRepository $techRep): Response
+    public function index(ClientsRepository $clientsRep ,
+                          SerializerInterface $serializer,
+                          TechnicienRepository $techRep):JsonResponse
     {
-        $client = $clientsRep->findAll();
-        $tech = $techRep->findAll();
-        return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
-            'clients' => $client,
-            'techs' => $tech,
-        ]);
+
+        $serializedClients = $serializer->serialize($clientsRep->findAll(), 'json');
+        $serializedTechs= $serializer->serialize($techRep->findAll(), 'json');
+        return new JsonResponse([
+            "Clients"=>$serializedClients,
+            "techs"=>$serializedTechs]);
     }
 
     /**
      * @Route("/client/addClient", name="AddClient", methods={"POST"})
      */
-    public function ajouterClient(Request $request, EntityManagerInterface $entityManager, Helpers $help)
+    public function ajouterClient(Request $request,
+                                  EntityManagerInterface $entityManager,
+                                  Helpers $help)
     {
+<<<<<<< HEAD
+
+        if (empty($request->request->get('email')) || empty($request->request->get('password'))) {
+            $error = "Remplir Tous Les Champs";
+
+        }
+        $checkUserExistence = $help->SearchUser($request->request->get('email'));
+        if($checkUserExistence){
+=======
         
         $fullname = $request->get('lastname').$request->get('firstname');
         if (empty($fullname) || empty($request->request->get('email')) || empty($request->request->get('password'))) {
@@ -44,11 +58,18 @@ class MainController extends AbstractController
                 'error' => $error
             ]);
         }elseif($help->SearchUser($request->request->get('email'))){
+>>>>>>> 340fe13f5c669ace902624b7320882918f12a6f0
             $error = "Ce email est deja existe";
-            return $this->render('main/AddClientForm.html.twig', [
-                'error' => $error,
-            ]);
         }else{
+<<<<<<< HEAD
+            $client = new Clients();
+            $fullname = $request->get('lastname').$request->get('firstname');
+            $client->setUsername($fullname)->setEmail($request->request->get('email'))
+                ->setPassword($request->request->get('password'));
+            $entityManager->persist($client);
+            $entityManager->flush();
+            return $this->redirectToRoute('AdminMain');
+=======
         $client = new Clients();
         $entityManager->persist($client);
         $client->setUsername($fullname);
@@ -56,6 +77,7 @@ class MainController extends AbstractController
         $client->setPassword($request->request->get('password'));
         $entityManager->flush();
         return $this->redirectToRoute('AdminMain');
+>>>>>>> 340fe13f5c669ace902624b7320882918f12a6f0
         }
     }
     /**

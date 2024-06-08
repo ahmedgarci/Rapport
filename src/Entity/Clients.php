@@ -6,11 +6,12 @@ use App\Repository\ClientsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=ClientsRepository::class)
  */
-class Clients
+class Clients implements UserInterface
 {
     /**
      * @ORM\Id
@@ -80,7 +81,7 @@ class Clients
 
     public function setPassword(string $password): self
     {
-        $this->password = $password;
+        $this->password = password_hash($password,PASSWORD_BCRYPT);
 
         return $this;
     }
@@ -113,5 +114,20 @@ class Clients
         }
 
         return $this;
+    }
+
+    public function getRoles()
+    {
+        return null;
+    }
+
+    public function getSalt()
+    {
+    return null;
+    }
+
+    public function eraseCredentials()
+    {
+    return null;
     }
 }

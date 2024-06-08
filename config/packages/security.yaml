@@ -1,4 +1,8 @@
 security:
+    encoders:
+        App\Entity\Admin:
+            algorithm: bcrypt
+            cost: 12
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         users_in_memory: { memory: null }
