@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello GenRapporController!{% endblock %}
+
+{% block body %}
+<form action="{{ path('stockRapport') }}" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+        <label for="file">Rapport:</label>
+        <input type="file" id="file" name="file" accept=".pdf" required>
+    </div>
+    <div>
+        <button type="submit">Upload</button>
+    </div>
+</form>
+{% endblock %}

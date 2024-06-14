@@ -2,17 +2,20 @@
 
 namespace App\Controller;
 
+use DateTime;
+use DateTimeZone;
 use App\Helpers;
 use App\Entity\Clients;
+use App\Entity\Rapports;
 use App\Entity\Technicien;
 use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
 use App\Repository\TechnicienRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
@@ -235,4 +238,92 @@ class MainController extends AbstractController
             return $this->redirectToRoute('AdminMain');
         }
     }
+
+
+
+    /**
+     * @Route("/technicien/send", name="showsendRapport")
+     */
+    public function show(): Response
+    {
+        return $this->render('main/send.html.twig', [
+            'controller_name' => 'GenRapporController',
+        ]);
+    }
+
+
+    /**
+     * @Route("/gen/send/rapport", name="stockRapport", methods={"POST"})
+     */
+    public function send(Request $req, EntityManagerInterface $entity)
+    {
+
+    $idd= 2;
+    $technicient = $this->gettechnicien($idd,$entity);
+
+
+
+
+    $client = $this->getClient($req->request->get('email'), $entity);
+    if ($client === null) {
+        return new Response('client introuvable', Response::HTTP_BAD_REQUEST);
+    }
+    $rapport = new Rapports();
+    $rapport->setTitle($req->request->get('title'));
+    $uploadedFile = $req->files->get('file');
+    $uploadsDirectory = $this->getParameter('upload_directory');
+    $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+    $newFilename = $originalFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+    $uploadedFile->move($uploadsDirectory, $newFilename);
+    $rapport->setContent($newFilename);
+
+    $rapport->setTech($technicient);
+
+    $rapport->setClient($client);
+    $entity->persist($rapport);
+    $entity->flush();
+    return new Response('bieeen');
+    }
+
+
+
+    /**
+     * @Route("/client/getrap/{id}", name="getrapp", methods={"GET"})
+     */
+    public function getRapport(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $rapports = $entityManager->getRepository(Rapports::class)->findBy(['client' => $id]);
+        $rapportData = [];
+        foreach ($rapports as $rapport) {
+            $file = stream_get_contents($rapport->getContent());
+            $rapportData[] = [
+                'id' => $rapport->getId(),
+                'title' => $rapport->getTitle(),
+                'rapport' => $file,
+            ];
+        }
+        return new JsonResponse($rapportData);
+    }
+
+
+
+
+    private function getClient(string $email, EntityManagerInterface $em): ?Clients
+    {
+        return $em->getRepository(Clients::class)->findOneBy(['email' => $email]);
+    }
+
+
+
+    private function gettechnicien(int $id, EntityManagerInterface $em): ?Technicien
+    {
+        return $em->getRepository(Technicien::class)->findOneBy(['id' => $id]);
+    }
+
+
+
+
+
+
+
 }
