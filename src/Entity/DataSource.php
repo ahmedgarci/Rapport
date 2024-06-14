@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=DataSourceRepository::class)
  */
-class DataSource
+class DataSource 
 {
     /**
      * @ORM\Id
@@ -26,7 +26,12 @@ class DataSource
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $Url;
+    private $fileName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mimeType;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
@@ -50,14 +55,26 @@ class DataSource
         return $this;
     }
 
-    public function getUrl(): ?string
+    public function getMimeType(): ?string
     {
-        return $this->Url;
+        return $this->mimeType;
     }
 
-    public function setUrl(?string $Url): self
+    public function setMimeType(?string $type): self
     {
-        $this->Url = $Url;
+        $this->mimeType = $type;
+
+        return $this;
+    }
+
+    public function getFileName(): ?string
+    {
+        return $this->fileName;
+    }
+
+    public function setFileName(?string $Url): self
+    {
+        $this->fileName = $Url;
 
         return $this;
     }
