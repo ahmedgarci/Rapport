@@ -23,15 +23,23 @@ class DataSource
      */
     private $tech;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $Url;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
      */
     private $content;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fileName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mimeType;
+
+
 
     public function getId(): ?int
     {
@@ -50,18 +58,6 @@ class DataSource
         return $this;
     }
 
-    public function getUrl(): ?string
-    {
-        return $this->Url;
-    }
-
-    public function setUrl(?string $Url): self
-    {
-        $this->Url = $Url;
-
-        return $this;
-    }
-
     public function getContent()
     {
         return $this->content;
@@ -70,6 +66,30 @@ class DataSource
     public function setContent($content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getFileName(): ?string
+    {
+        return $this->fileName;
+    }
+
+    public function setFileName(?string $fileName): self
+    {
+        $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    public function getMimeType(): ?string
+    {
+        return $this->mimeType;
+    }
+
+    public function setMimeType(?string $mimeType): self
+    {
+        $this->mimeType = $mimeType;
 
         return $this;
     }

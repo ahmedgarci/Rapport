@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reports{% endblock %}
+
+{% block body %}
+<h1>Reports</h1>
+<ul>
+    {% for rapport in rapdata %}
+        <li>
+            <h4>{{ rapport.title }}</h4>
+            <p>{{ rapport.id }}</p>
+            <a>{{rapport.rapport}}</a>
+        </li>
+    {% else %}
+        <li>No reports found</li>
+    {% endfor %}
+</ul>
+{% endblock %}

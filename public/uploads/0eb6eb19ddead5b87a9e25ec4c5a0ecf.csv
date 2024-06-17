@@ -1,0 +1,3 @@
+region,country,country_code,age_group,age_lower,age_upper,pop_date,pop_male,pop_female,pop_both
+North America,Canada,CA,0-14,0,14,2023-01-01,10000,11000,21000
+North America,USA,US,25-34,25,34,2023-01-01,15000,14000,29000

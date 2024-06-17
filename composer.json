@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.7",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.19",
+        "geekcom/phpjasper": "^3.4",
         "lexik/jwt-authentication-bundle": "2.11",
         "nelmio/cors-bundle": "^2.3",
         "phpdocumentor/reflection-docblock": "^5.4",
@@ -97,6 +98,3 @@
         }
     }
 }
-
-
-

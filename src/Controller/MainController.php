@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use DateTime;
-use DateTimeZone;
 use App\Helpers;
+use DateTimeZone;
 use App\Entity\Clients;
 use App\Entity\Rapports;
 use App\Entity\Technicien;
@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
@@ -25,11 +26,7 @@ class MainController extends AbstractController
     /**
      * @Route("/Admin", name="AdminMain",methods={"GET"})
      */
-    public function index(
-        ClientsRepository $clientsRep,
-        SerializerInterface $serializer,
-        TechnicienRepository $techRep
-    ): JsonResponse {
+    public function index(ClientsRepository $clientsRep,SerializerInterface $serializer,TechnicienRepository $techRep):JsonResponse {
 
         $serializedClients = $serializer->serialize($clientsRep->findAll(), 'json');
         $serializedTechs = $serializer->serialize($techRep->findAll(), 'json');
@@ -42,11 +39,7 @@ class MainController extends AbstractController
     /**
      * @Route("/client/addClient", name="AddClient", methods={"POST"})
      */
-    public function ajouterClient(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        Helpers $help
-    ) {
+    public function ajouterClient(Request $request,EntityManagerInterface $entityManager,Helpers $help) {
 
 
         if (empty($request->request->get('email')) || empty($request->request->get('password'))) {
@@ -262,8 +255,6 @@ class MainController extends AbstractController
     $technicient = $this->gettechnicien($idd,$entity);
 
 
-
-
     $client = $this->getClient($req->request->get('email'), $entity);
     if ($client === null) {
         return new Response('client introuvable', Response::HTTP_BAD_REQUEST);
@@ -286,7 +277,6 @@ class MainController extends AbstractController
     }
 
 
-
     /**
      * @Route("/client/getrap/{id}", name="getrapp", methods={"GET"})
      */
@@ -299,13 +289,11 @@ class MainController extends AbstractController
             $rapportData[] = [
                 'id' => $rapport->getId(),
                 'title' => $rapport->getTitle(),
-                'rapport' => $file,
+                'rapport' => $file
             ];
         }
-        return new JsonResponse($rapportData);
+    return new JsonResponse(["rapdata" => $rapportData]);
     }
-
-
 
 
     private function getClient(string $email, EntityManagerInterface $em): ?Clients
@@ -314,16 +302,8 @@ class MainController extends AbstractController
     }
 
 
-
     private function gettechnicien(int $id, EntityManagerInterface $em): ?Technicien
     {
         return $em->getRepository(Technicien::class)->findOneBy(['id' => $id]);
     }
-
-
-
-
-
-
-
 }
