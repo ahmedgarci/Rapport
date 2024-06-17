@@ -17,10 +17,8 @@ class MainController extends AbstractController
      * @Route("/Admin", name="AdminMain",methods="GET")
      */
     public function index(ClientsRepository $clientsRep, SerializerInterface $serializer ,
-
                           TechnicienRepository $techRep):JsonResponse
     {
-
         $serializedClients = json_decode($serializer->serialize($clientsRep->findAll(), 'json'));
         $serializedTechs= json_decode($serializer->serialize($techRep->findAll(), 'json'));
         return new JsonResponse([

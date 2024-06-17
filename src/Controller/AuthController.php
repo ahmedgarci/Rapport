@@ -36,7 +36,6 @@ class AuthController extends AbstractController
         //    ->setUsername("aaa");
         $userData = json_decode($request->getContent(), true);
         $Exists = $helpers->SearchUser($userData["email"],null);
-     //   return new JsonResponse($JWTEncoder->decode($request->cookies->get("user")));
         if(!$Exists){
             return new JsonResponse("User Not Found",JsonResponse::HTTP_NOT_FOUND ,json: true);
         }
