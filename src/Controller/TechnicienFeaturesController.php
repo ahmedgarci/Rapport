@@ -57,6 +57,9 @@ class TechnicienFeaturesController extends AbstractController
         $rapportsRepository->add($rapport, true);
         return new JsonResponse(" Report Sent To The Specific Client ", Response::HTTP_OK);
     }
+
+
+
     /**
      * @Route("/Techniciens/download", name="download_file")
      */
@@ -81,6 +84,14 @@ class TechnicienFeaturesController extends AbstractController
         }
     }
 
+
+      /**
+     * @Route("/Techniciens/getClientsDemands", name="download_file")
+     */
+    public function getDemands()
+    {
+        return new JsonResponse(" Report Sent To The Specific Client ", Response::HTTP_OK);
+    }
 
 
 
