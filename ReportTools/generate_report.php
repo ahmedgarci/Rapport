@@ -1,17 +1,44 @@
 <?php
 
-require '../vendor/autoload.php';
+function getCsvData(): array
+{
+    $csvFilePath = '../public/uploads/0eb6eb19ddead5b87a9e25ec4c5a0ecf.csv';
+    $file = fopen($csvFilePath, 'r');
+    $csvData = [];
+    $headers = fgetcsv($file);
+    while (($row = fgetcsv($file)) !== false) {
+        $csvData[] = array_combine($headers, $row);
+    }
+
+    fclose($file);
+    return $csvData;
+}
+
+$csvdata = getCsvData();
+$csvJson = json_encode($csvdata);
+
+
+
+
 
 use PHPJasper\PHPJasper;
+require '../vendor/autoload.php';
 
-$input = '../vendor/geekcom/phpjasper/examples/hello_world.jasper';
-$output = '../vendor/geekcom/phpjasper/examples';
+$input = __DIR__ . '/../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
+
+$newFilename = uniqid();
+
+$output = __DIR__ . '/../public/reports/' . $newFilename;
+
+$csvdataJson = json_encode($csvdata);
+
 $options = [
-    'format' => ['pdf', 'rtf']
-];
-
-
-
+    'format' => ['pdf'],
+    'locale' => 'en',
+    'params' => [
+        'NomDuClient' => "Saidani Hazem",
+        'EmailDuClient' => "SaidaniHazem022@gmail.com",
+        'NomDuTechnicien' => "Garci Ahmed"]];
 $jasper = new PHPJasper;
 try {
     echo "Starting report generation process...\n";
