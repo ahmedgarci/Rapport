@@ -58,6 +58,5 @@ class Helpers
             return null;
         }
 
-    }
-
+}
 }

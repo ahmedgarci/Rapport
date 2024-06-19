@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
@@ -31,7 +32,6 @@ class TechnicienFeaturesController extends AbstractController
         RapportsRepository $rapportsRepository,
         Helpers             $helpers,
         jwtEncoderInterface $jwtEncoder,
-
     ): JsonResponse
     {
         $token = $request->cookies->get("user");
