@@ -69,9 +69,7 @@ class TechnicienFeaturesController extends AbstractController
             $pdf->Cell(40, 10, "hello world");
 
             $pdfContent = $pdf->Output("S");
-
             $logger->info('PDF generated successfully');
-
             return new Response($pdfContent, Response::HTTP_OK, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="example.pdf"',
