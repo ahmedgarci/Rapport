@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use App\Repository\ClientsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -35,14 +35,21 @@ class Clients implements UserInterface
      */
     private $password;
 
-    /**
+      /**
      * @ORM\OneToMany(targetEntity=Rapports::class, mappedBy="client")
+     * @MaxDepth(1)
      */
     private $rapports;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DBSource::class, mappedBy="client_id")
+     */
+    private $dBSources;
 
     public function __construct()
     {
         $this->rapports = new ArrayCollection();
+        $this->dBSources = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,5 +136,35 @@ class Clients implements UserInterface
     public function eraseCredentials()
     {
     return null;
+    }
+
+    /**
+     * @return Collection<int, DBSource>
+     */
+    public function getDBSources(): Collection
+    {
+        return $this->dBSources;
+    }
+
+    public function addDBSource(DBSource $dBSource): self
+    {
+        if (!$this->dBSources->contains($dBSource)) {
+            $this->dBSources[] = $dBSource;
+            $dBSource->setClientId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDBSource(DBSource $dBSource): self
+    {
+        if ($this->dBSources->removeElement($dBSource)) {
+            // set the owning side to null (unless already changed)
+            if ($dBSource->getClientId() === $this) {
+                $dBSource->setClientId(null);
+            }
+        }
+
+        return $this;
     }
 }
