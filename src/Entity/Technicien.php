@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-
 /**
  * @ORM\Entity(repositoryClass=TechnicienRepository::class)
  */
@@ -19,6 +18,8 @@ class Technicien implements UserInterface
      * @ORM\Column(type="integer")
      */
     private $id;
+     
+
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -45,10 +46,16 @@ class Technicien implements UserInterface
      */
     private $rapports;
 
+    /**
+     * @ORM\OneToMany(targetEntity=DBSource::class, mappedBy="Tech")
+     */
+    private $dBSources;
+
     public function __construct()
     {
         $this->dataSources = new ArrayCollection();
         $this->rapports = new ArrayCollection();
+        $this->dBSources = new ArrayCollection();
     }
 
 
@@ -167,6 +174,36 @@ class Technicien implements UserInterface
     public function eraseCredentials()
     {
         return null;
+    }
+
+    /**
+     * @return Collection<int, DBSource>
+     */
+    public function getDBSources(): Collection
+    {
+        return $this->dBSources;
+    }
+
+    public function addDBSource(DBSource $dBSource): self
+    {
+        if (!$this->dBSources->contains($dBSource)) {
+            $this->dBSources[] = $dBSource;
+            $dBSource->setTech($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDBSource(DBSource $dBSource): self
+    {
+        if ($this->dBSources->removeElement($dBSource)) {
+            // set the owning side to null (unless already changed)
+            if ($dBSource->getTech() === $this) {
+                $dBSource->setTech(null);
+            }
+        }
+
+        return $this;
     }
 
 

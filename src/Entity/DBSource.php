@@ -47,6 +47,11 @@ class DBSource
      */
     private $DB;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Technicien::class, inversedBy="dBSources")
+     */
+    private $Tech;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,7 +89,6 @@ class DBSource
     public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -120,6 +124,18 @@ class DBSource
     public function setDB(string $DB): self
     {
         $this->DB = $DB;
+
+        return $this;
+    }
+
+    public function getTech(): ?Technicien
+    {
+        return $this->Tech;
+    }
+
+    public function setTech(?Technicien $Tech): self
+    {
+        $this->Tech = $Tech;
 
         return $this;
     }

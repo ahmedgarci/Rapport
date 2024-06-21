@@ -1,74 +1,54 @@
 <?php
 
 namespace App\Controller;
-
 use App\Entity\DBSource;
 use PHPJasper\PHPJasper;
 use App\Repository\ClientsRepository;
+use App\Repository\TechnicienRepository;
 use App\Repository\DBSourceRepository;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 
 class DBreportsController extends AbstractController
 {
-
-
-
     /**
-     * @Route("/db/demande", name="show", methods={"POST"})
+     * @Route("/Client/DemandeRapport", name="dbdemande", methods={"POST"})
      */
-    public function showDbReport(): Response
+    public function Save_Report_To_Do(Request $request,JWTEncoderInterface $jwtEncoder,
+    TechnicienRepository $techRepo,SerializerInterface $serializer,
+    DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): Response
     {
-        return $this->render('d_breports/index.html.twig');
-    }
-
-
-
-
-    /**
-     * @Route("/db/demande", name="dbdemande", methods={"POST"})
-     */
-    public function Save_Report_To_Do(Request $request, DBSourceRepository $dbsource, ClientsRepository $cli): Response
-    {
+  //      $token = $request->cookies->get("user");
+  //      if(!$token){
+  //          return new JsonResponse('Unauthorized',Response::HTTP_UNAUTHORIZED);            
+  //      }
+        $technicien = $techRepo->findOneBy(["id"=> 1]);
+ //       if(!$technicien){
+  //          return new JsonResponse('Technicien n existe pas !');            
+  //      }
+        $requestData = json_decode($request->getContent(),true);
+  //     $userData = $jwtEncoder->decode($token);
         try {
-            $client = $cli->find(23);
+            $client = $clientRep->findOneBy(["id"=>1]);
             $rapport = new DBSource();
-            $rapport->setDriver($request->get('driver'))
-                ->setUsername($request->get('username'))
-                ->setPassword($request->get('password'))
-                ->setHost($request->get('host'))
-                ->setDB($request->get('database'))
-                ->setClientId($client);
-            $dbsource->add($rapport, true);
-            
+            $rapport->setDriver($requestData["driver"])
+                ->setUsername($requestData["username"])
+                ->setPassword($requestData["password"])
+                ->setHost($requestData["host"])
+                ->setDB($requestData["driver"])
+                ->setClientId($client)
+                ->setTech($technicien);
+            $dbSourceRep->add($rapport, true);
             return new Response('Demande Envoyée');
         } catch (\Exception $e) {
             return new Response('Error : ' . $e->getMessage());
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**

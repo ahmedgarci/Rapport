@@ -16,6 +16,7 @@ $databaseOptions = [
     'database' => 'lara11',
 ];
 
+
 $options = [
     'format' => ['pdf'],
     'locale' => 'en',

@@ -9,89 +9,82 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use App\Helpers;
 use App\Repository\RapportsRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use FPDF;
+use App\Repository\DBSourceRepository;
+use App\Repository\AdminRepository;
+use App\Repository\ClientsRepository;
+use App\Repository\TechnicienRepository;
 
 class TechnicienFeaturesController extends AbstractController
 {
-    public  function __construct (SerializerInterface $serializer ,)
-    {
-
-    }
-
 
     /**
      * @Route("/Techniciens/PublishReport", name="app_technicien")
      */
     public function index(
-        Request             $request,
+        Request $request,
         RapportsRepository $rapportsRepository,
-        Helpers             $helpers,
-        jwtEncoderInterface $jwtEncoder,
+        Helpers $helpers,
+        ClientsRepository $clientsRepository,
+        TechnicienRepository $tech,
+        JWTEncoderInterface $jwtEncoder,
+        SerializerInterface $serializer
     ): JsonResponse
     {
         $token = $request->cookies->get("user");
-        if(!$token){
-            return new JsonResponse("Unauthorized",Response::HTTP_UNAUTHORIZED);
+        if (!$token) {
+            return new JsonResponse("Unauthorized", Response::HTTP_UNAUTHORIZED);
         }
+
         $Receiver = $request->request->get("email");
-        $ClientReceiver = $helpers->searchUser($Receiver, null);
-        if (!$ClientReceiver || $ClientReceiver == null) {
+        $client = $clientsRepository->findOneBy(["email" => "ahmedgarci146@gmail.com"]);
+        if (!$client || $client == null) {
             return new JsonResponse('client introuvable', Response::HTTP_BAD_REQUEST);
         }
         $uploadedFile = $request->files->get("file");
         $titre = $request->request->get("title");
         $userDecodedData = $jwtEncoder->decode($token);
-        $TechnicienSender = $helpers->searchUser(null,$userDecodedData['id']);
+        $technician = $tech->findOneBy(["id" => $userDecodedData["id"]]);
         $rapport = new Rapports();
-        $rapport->setTitle($titre);
         $uploadsDirectory = $this->getParameter('upload_directory');
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $newFilename = $originalFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+        $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
         $uploadedFile->move($uploadsDirectory, $newFilename);
-        $rapport->setContent($newFilename)->setTech($TechnicienSender)->setClient($ClientReceiver);
+        $rapport->setTitle($titre);
+        $rapport->setClient($client);
+        $rapport->setTech($technician);
+        $rapport->setReportPath($newFilename);
         $rapportsRepository->add($rapport, true);
-        return new JsonResponse(" Report Sent To The Specific Client ", Response::HTTP_OK);
+        return new JsonResponse("Report Sent To The Specific Client", Response::HTTP_OK);
     }
 
-
-
-    /**
-     * @Route("/Techniciens/download", name="download_file")
+     /**
+     * @Route("/Techniciens/showDemands", name="dbdemande", methods={"GET"})
      */
-    public function download(LoggerInterface $logger)
+    public function Show(Request $request, JWTEncoderInterface $jwtEncoder, TechnicienRepository $techRepo, SerializerInterface $serializer, DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): Response
     {
         try {
-            $pdf = new FPDF();
-            $pdf->AddPage();
-            $pdf->SetFont('Arial', 'B', 16);
-            $pdf->Cell(40, 10, "hello world");
-
-            $pdfContent = $pdf->Output("S");
-            $logger->info('PDF generated successfully');
-            return new Response($pdfContent, Response::HTTP_OK, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="example.pdf"',
-            ]);
+            
+            $dem = $dbSourceRep->find(["host"=> "aaaaa" ]);
+            // Sérialiser l'objet technicien sans référence circulaire
+            $jsonContent = $serializer->serialize($dem, 'json', ['groups' => 'show_technicien']);
+            
+            return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            $logger->error('Error generating PDF: ' . $e->getMessage());
-
-            return new Response('Internal Server Error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => 'Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
 
-      /**
-     * @Route("/Techniciens/getClientsDemands", name="download_file")
-     */
-    public function getDemands()
-    {
-        return new JsonResponse(" Report Sent To The Specific Client ", Response::HTTP_OK);
-    }
+
+
+   
+
+
 
 
 

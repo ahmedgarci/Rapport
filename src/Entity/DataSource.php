@@ -23,7 +23,6 @@ class DataSource
      */
     private $tech;
 
-
     /**
      * @ORM\Column(type="blob", nullable=true)
      */

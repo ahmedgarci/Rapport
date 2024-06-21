@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\RapportsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Clients;
+use App\Entity\Technicien;
 
 /**
  * @ORM\Entity(repositoryClass=RapportsRepository::class)
@@ -40,9 +42,10 @@ class Rapports
     private $date;
 
     /**
-     * @ORM\Column(type="blob", nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    private $content;
+    private $reportPath;
+
 
     public function getId(): ?int
     {
@@ -97,14 +100,14 @@ class Rapports
         return $this;
     }
 
-    public function getContent()
+    public function getReportPath(): ?string
     {
-        return $this->content;
+        return $this->reportPath;
     }
 
-    public function setContent($content): self
+    public function setReportPath(string $reportPath): self
     {
-        $this->content = $content;
+        $this->reportPath = $reportPath;
 
         return $this;
     }
