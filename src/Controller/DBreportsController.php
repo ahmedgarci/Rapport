@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Controller;
+
+use App\Entity\Clients;
 use App\Entity\DBSource;
+use App\Entity\Rapports;
+use App\Repository\RapportsRepository;
+use App\Repository\TechnicienRepository;
 use PHPJasper\PHPJasper;
 use App\Repository\ClientsRepository;
-use App\Repository\TechnicienRepository;
 use App\Repository\DBSourceRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,7 +58,7 @@ class DBreportsController extends AbstractController
     /**
      * @Route("/db/showparams", name="dbreport", methods={"POST"})
      */
-    public function genererRapport(Request $request): Response
+    public function genererRapport(Request $request, ClientsRepository $client , RapportsRepository $rap, TechnicienRepository $technicien): Response
     {
         require __DIR__ . '/../../vendor/autoload.php';
         $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
@@ -78,7 +82,15 @@ class DBreportsController extends AbstractController
                 'NomDuTechnicien' => "Garci Ahmed"
             ]
         ];
+
+        $cli = $client->find(23);
+        $techni = $technicien->find(2);
+
+        $rapport = new Rapports();
+        $rapport->setClient($cli)->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))->settitle("Report")->setTech($techni);
+        $rap->add($rapport);
         $jasper = new PHPJasper;
+
         try {
             $jasper->process($input, $output, $options)->execute();
             return new Response(
@@ -87,7 +99,7 @@ class DBreportsController extends AbstractController
         } catch (\Exception $e) {
             return new Response('Error generating report: ' . $e->getMessage());
         }
-    }
+}
 
 
 
@@ -101,27 +113,6 @@ class DBreportsController extends AbstractController
             'params' => $params
         ]);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -167,9 +158,7 @@ class DBreportsController extends AbstractController
                 'csvData' => $csvdataJson
             ]
         ];
-
         $jasper = new PHPJasper;
-
         try {
             echo "Starting report generation process...\n";
             $jasper->process($input, $output, $options)->execute();
@@ -178,6 +167,8 @@ class DBreportsController extends AbstractController
             echo "Error generating report: " . $e->getMessage() . "\n";
         }
     }
+
+
 
 
 
