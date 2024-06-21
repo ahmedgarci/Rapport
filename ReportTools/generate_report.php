@@ -1,4 +1,8 @@
 <?php
+use PHPJasper\PHPJasper;
+require '../vendor/autoload.php';
+
+
 
 function getCsvData(): array
 {
@@ -9,28 +13,19 @@ function getCsvData(): array
     while (($row = fgetcsv($file)) !== false) {
         $csvData[] = array_combine($headers, $row);
     }
-
     fclose($file);
     return $csvData;
 }
 
+
 $csvdata = getCsvData();
-$csvJson = json_encode($csvdata);
 
 
 
-
-
-use PHPJasper\PHPJasper;
-require '../vendor/autoload.php';
-
-$input = __DIR__ . '/../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
-
+$input = __DIR__ . '/../vendor/geekcom/phpjasper/examples/hello_worldTocsv.jrxml';
 $newFilename = uniqid();
+$output = __DIR__ . '/../public/reports/testCSV';
 
-$output = __DIR__ . '/../public/reports/' . $newFilename;
-
-$csvdataJson = json_encode($csvdata);
 
 $options = [
     'format' => ['pdf'],
