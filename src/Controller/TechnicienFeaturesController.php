@@ -18,6 +18,7 @@ use App\Repository\DBSourceRepository;
 use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
 use App\Repository\TechnicienRepository;
+use App\Entity\DBSource;
 
 class TechnicienFeaturesController extends AbstractController
 {
@@ -62,27 +63,22 @@ class TechnicienFeaturesController extends AbstractController
         return new JsonResponse("Report Sent To The Specific Client", Response::HTTP_OK);
     }
 
+
      /**
      * @Route("/Techniciens/showDemands", name="dbdemande", methods={"GET"})
      */
-    public function Show(Request $request, JWTEncoderInterface $jwtEncoder, TechnicienRepository $techRepo, SerializerInterface $serializer, DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): Response
+    public function Show(Request $request, JWTEncoderInterface $jwtEncoder, TechnicienRepository $techRepo, SerializerInterface $serializer, DBSourceRepository $dbSourceRep, ClientsRepository $clientRep)
     {
         try {
-            
-            $dem = $dbSourceRep->find(["host"=> "aaaaa" ]);
-            // Sérialiser l'objet technicien sans référence circulaire
+            $dem = $dbSourceRep->findBy(['Tech' => 5]);
             $jsonContent = $serializer->serialize($dem, 'json', ['groups' => 'show_technicien']);
-            
+            dd($dem);
             return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
-        } catch (\Exception $e) {
+      } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+      }
     }
 
-
-
-
-   
 
 
 

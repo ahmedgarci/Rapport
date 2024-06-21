@@ -51,8 +51,8 @@ class DBreportsController extends AbstractController
             return new Response('Demande Envoyée');
         } catch (\Exception $e) {
             return new Response('Error : ' . $e->getMessage());
-        }
-    }
+        }}
+
 
 
     /**
