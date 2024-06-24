@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\TechnicienRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * @ORM\Entity(repositoryClass=TechnicienRepository::class)
  */
@@ -16,18 +18,19 @@ class Technicien implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"Tech:TechInfo"})
      */
     private $id;
-     
-
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"Tech:TechInfo"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"Tech:TechInfo"})
      */
     private $email;
 
@@ -47,7 +50,7 @@ class Technicien implements UserInterface
     private $rapports;
 
     /**
-     * @ORM\OneToMany(targetEntity=DBSource::class, mappedBy="Tech")
+     * @ORM\OneToMany(targetEntity=DBSource::class, mappedBy="tech") // Ensure this matches the property name in DBSource
      */
     private $dBSources;
 
@@ -57,9 +60,6 @@ class Technicien implements UserInterface
         $this->rapports = new ArrayCollection();
         $this->dBSources = new ArrayCollection();
     }
-
-
-
 
     public function getId(): ?int
     {
@@ -97,7 +97,7 @@ class Technicien implements UserInterface
 
     public function setPassword(string $password): self
     {
-        $this->password = password_hash($password,PASSWORD_BCRYPT);
+        $this->password = password_hash($password, PASSWORD_BCRYPT);
         return $this;
     }
 
@@ -161,21 +161,6 @@ class Technicien implements UserInterface
         return $this;
     }
 
-    public function getRoles()
-    {
-        return null;
-    }
-
-    public function getSalt()
-    {
-        return null;
-    }
-
-    public function eraseCredentials()
-    {
-        return null;
-    }
-
     /**
      * @return Collection<int, DBSource>
      */
@@ -206,6 +191,18 @@ class Technicien implements UserInterface
         return $this;
     }
 
+    public function getRoles()
+    {
+        return null;
+    }
 
+    public function getSalt()
+    {
+        return null;
+    }
 
+    public function eraseCredentials()
+    {
+        return null;
+    }
 }

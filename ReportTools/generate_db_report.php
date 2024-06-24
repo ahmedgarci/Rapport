@@ -10,22 +10,18 @@ $output = __DIR__ . '/../public/reports/' . $newFilename;
 
 $databaseOptions = [
     'driver' => 'mysql',
-    'username' => 'hazem',
-    'password' => 'hazem', 
+    'username' => 'root',
+    'password' => '0000', 
     'host' => '127.0.0.1',
-    'database' => 'lara11',
+    'database' => 'rapport',
 ];
 
 
 $options = [
     'format' => ['pdf'],
     'locale' => 'en',
-    'db_connection' => $databaseOptions,
-    'params' => [
-        'NomDuClient' => "Saidani Hazem",
-        'EmailDuClient' => "SaidaniHazem022@gmail.com",
-        'NomDuTechnicien' => "Garci Ahmed"
-    ]
+    'db_connection' => $databaseOptions
+   
 ];
 
 $jasper = new PHPJasper;

@@ -13,42 +13,47 @@ use App\Repository\DBSourceRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use App\Helpers;
+use Doctrine\ORM\EntityManagerInterface;
 
 class DBreportsController extends AbstractController
 {
+    
+
     /**
      * @Route("/Client/DemandeRapport", name="dbdemande", methods={"POST"})
      */
     public function Save_Report_To_Do(Request $request,JWTEncoderInterface $jwtEncoder,
-    TechnicienRepository $techRepo,SerializerInterface $serializer,
-    DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): Response
+    TechnicienRepository $techRepo,SerializerInterface $serializer,Helpers $helpers,
+    DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): JsonResponse
     {
-  //      $token = $request->cookies->get("user");
-  //      if(!$token){
-  //          return new JsonResponse('Unauthorized',Response::HTTP_UNAUTHORIZED);            
-  //      }
-        $technicien = $techRepo->findOneBy(["id"=> 1]);
- //       if(!$technicien){
-  //          return new JsonResponse('Technicien n existe pas !');            
-  //      }
+        $token = $request->cookies->get("user");
+        if(!$token){
+            return new JsonResponse('Unauthorized',Response::HTTP_UNAUTHORIZED);            
+        }
         $requestData = json_decode($request->getContent(),true);
-  //     $userData = $jwtEncoder->decode($token);
+        $technicien = $techRepo->findOneBy(["email"=> $requestData["emailTech"]]);
+        if(!$technicien){
+            return new JsonResponse('Technicien n existe pas !');            
+        }
+        $ClientId = $helpers->DecodeToken($token);
         try {
-            $client = $clientRep->findOneBy(["id"=>1]);
+            $client = $clientRep->findOneBy(["id"=>$ClientId]);
             $rapport = new DBSource();
             $rapport->setDriver($requestData["driver"])
                 ->setUsername($requestData["username"])
                 ->setPassword($requestData["password"])
                 ->setHost($requestData["host"])
                 ->setDB($requestData["driver"])
-                ->setClientId($client)
+                ->setClient($client)
                 ->setTech($technicien);
             $dbSourceRep->add($rapport, true);
-            return new Response('Demande Envoyée');
+            return new JsonResponse('Demande Envoyée');
         } catch (\Exception $e) {
             return new Response('Error : ' . $e->getMessage());
         }
@@ -56,72 +61,54 @@ class DBreportsController extends AbstractController
 
 
     /**
-     * @Route("/db/showparams", name="dbreport", methods={"POST"})
+     * @Route("/Techniciens/GenererRapportAvecDB", name="dbreport", methods={"POST"})
      */
-    public function genererRapport(Request $request, ClientsRepository $client , RapportsRepository $rap, TechnicienRepository $technicien): Response
-    {
-        require __DIR__ . '/../../vendor/autoload.php';
-        $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
-        $newFilename = uniqid();
-        $output = __DIR__ . '/../../public/reports/' . $newFilename;
 
-        $databaseOptions = [
-            'driver' => $request->get("driver"),
-            'username' => $request->get("username"),
-            'password' => $request->get("password"),
-            'host' => $request->get("host"),
-            'database' => $request->get("database")
-        ];
-        $options = [
-            'format' => ['pdf'],
-            'locale' => 'en',
-            'db_connection' => $databaseOptions,
-            'params' => [
-                'NomDuClient' => "Saidani Hazem",
-                'EmailDuClient' => "saidanihazem022@gmail.com",
-                'NomDuTechnicien' => "Garci Ahmed"
-            ]
-        ];
-
-        $cli = $client->find(23);
-        $techni = $technicien->find(2);
-
-        $rapport = new Rapports();
-        $rapport->setClient($cli)->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))->settitle("Report")->setTech($techni);
-        $rap->add($rapport);
-        $jasper = new PHPJasper;
-
-        try {
+     public function genererRapport(Request $request, Helpers $helpers,
+     DBSourceRepository $dbSourceRep,EntityManagerInterface $em,
+     ClientsRepository $client, RapportsRepository $rap, 
+     TechnicienRepository $technicien): JsonResponse
+     {
+         require __DIR__ . '/../../vendor/autoload.php';
+         $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
+         $newFilename = uniqid();
+         $output = __DIR__ . '/../../public/reports/' . $newFilename;
+        
+ 
+         $DemandInfo = json_decode($request->getContent(), true)["DBInfo"];
+         $databaseOptions = [
+             'driver' => $DemandInfo["driver"],
+             'username' => $DemandInfo["username"],
+             'password' => $DemandInfo["password"],
+             'host' => $DemandInfo["host"],
+             'database' => $DemandInfo["DB"]
+         ];
+ 
+         $options = [
+             'format' => ['pdf'],
+             'locale' => 'en',
+             'db_connection' => $databaseOptions,
+         ];
+         $jasper = new PHPJasper();
+         try {
             $jasper->process($input, $output, $options)->execute();
-            return new Response(
-                'Report generated successfully. <a href="/reports/' . $newFilename . '.pdf">Download Report</a>'
-            );
-        } catch (\Exception $e) {
-            return new Response('Error generating report: ' . $e->getMessage());
-        }
+            $client = $client->findOneBy(["email"=>$DemandInfo["client"]["email"]]);
+            $tech = $technicien->find($helpers->DecodeToken($request->cookies->get("user")));
+            $rapport = new Rapports();
+            $rapport->setClient($client)
+            ->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))
+            ->setReportPath($newFilename)
+            ->settitle("Report")->setTech($tech);
+            $rap->add($rapport,true);
+            $ClientDbsource = $dbSourceRep->find(["id"=>$DemandInfo["id"]]);
+            $ClientDbsource->setIsGenerated(true);
+            $em->persist($ClientDbsource);
+            $em->flush();
+            return new JsonResponse("Generated");
+         } catch (\Exception $e) {
+             return new JsonResponse('error'. $e->getMessage(), 500);
+         }
 }
-
-
-
-    /**
-     * @Route("/db/showparams", name="showparams")
-     */
-    public function show_DB_Params(DBSourceRepository $dbsource)
-    {
-        $params = $dbsource->findAll();
-        return $this->render('d_breports/listParams.html.twig', [
-            'params' => $params
-        ]);
-    }
-
-
-
-
-
-
-
-
-
 
 
 

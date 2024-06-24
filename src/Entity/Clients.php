@@ -5,6 +5,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use App\Repository\ClientsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -17,16 +18,19 @@ class Clients implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"client:userInfo"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"client:userInfo"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"client:userInfo","client:userRelatedFields"})
      */
     private $email;
 
@@ -37,12 +41,14 @@ class Clients implements UserInterface
 
       /**
      * @ORM\OneToMany(targetEntity=Rapports::class, mappedBy="client")
-     * @MaxDepth(1)
+     * @MaxDepth(1)     
+     * @Groups({"client:userRelatedFields"})
      */
     private $rapports;
 
     /**
      * @ORM\OneToMany(targetEntity=DBSource::class, mappedBy="client_id")
+     * @Groups({"client:userRelatedFields"})
      */
     private $dBSources;
 

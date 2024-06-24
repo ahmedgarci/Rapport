@@ -7,19 +7,21 @@ use Exception;
 use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
 use App\Repository\TechnicienRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 
 class Helpers
 {
     private $technicienRepository;
     private $adminRepository;
     private $clientsRepository;
-
+    private $jwt;
     public function __construct(AdminRepository $adminRepository, ClientsRepository $clientsRepository,
-                                TechnicienRepository $technicienRep)
+                             JWTEncoderInterface $jwtEncoder,TechnicienRepository $technicienRep)
     {
         $this->adminRepository = $adminRepository;
         $this->clientsRepository = $clientsRepository;
         $this->technicienRepository = $technicienRep;
+        $this->jwt = $jwtEncoder;
     }
 
     public function searchUser($email=null, $id=null)
@@ -57,6 +59,31 @@ class Helpers
             error_log($e->getMessage());
             return null;
         }
-
 }
+
+
+    public function DecodeToken($Token){
+      $data = $this->jwt->decode($Token);
+        return $data["id"];
+    }
+ 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 }

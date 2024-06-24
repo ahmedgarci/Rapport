@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\DBSourceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,57 +15,72 @@ class DBSource
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"dbSource:db_Read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Clients::class, inversedBy="dBSources")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"dbSource:db_Read","client:userInfo"})
      */
-    private $client_id;
+    private $client;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"dbSource:db_Read"})
      */
     private $driver;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"dbSource:db_Read"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"dbSource:db_Read"})
      */
     private $host;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"dbSource:db_Read"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"dbSource:db_Read"})
      */
     private $DB;
 
     /**
      * @ORM\ManyToOne(targetEntity=Technicien::class, inversedBy="dBSources")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"Tech:TechInfo"})
      */
-    private $Tech;
+    private $tech;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isGenerated;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getClientId(): ?Clients
+    public function getClient(): ?Clients
     {
-        return $this->client_id;
+        return $this->client;
     }
 
-    public function setClientId(?Clients $client_id): self
+    public function setClient(?Clients $client): self
     {
-        $this->client_id = $client_id;
+        $this->client = $client;
 
         return $this;
     }
@@ -89,6 +105,7 @@ class DBSource
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -124,19 +141,32 @@ class DBSource
     public function setDB(string $DB): self
     {
         $this->DB = $DB;
-
         return $this;
     }
 
     public function getTech(): ?Technicien
     {
-        return $this->Tech;
+        return $this->tech;
     }
 
-    public function setTech(?Technicien $Tech): self
+    public function setTech(?Technicien $tech): self
     {
-        $this->Tech = $Tech;
+        $this->tech = $tech;
 
         return $this;
     }
+
+    public function getIsGenerated(): ?bool
+    {
+        return $this->isGenerated;
+    }
+
+    public function setIsGenerated(?bool $isGenerated): self
+    {
+        $this->isGenerated = $isGenerated;
+
+        return $this;
+    }
+
+
 }

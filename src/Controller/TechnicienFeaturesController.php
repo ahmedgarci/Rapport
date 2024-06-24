@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Rapports;
+use App\Entity\DBSource;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,7 +13,6 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use App\Helpers;
 use App\Repository\RapportsRepository;
 use Symfony\Component\Serializer\SerializerInterface;
-use FPDF;
 use App\Repository\DBSourceRepository;
 use App\Repository\AdminRepository;
 use App\Repository\ClientsRepository;
@@ -39,7 +38,6 @@ class TechnicienFeaturesController extends AbstractController
         if (!$token) {
             return new JsonResponse("Unauthorized", Response::HTTP_UNAUTHORIZED);
         }
-
         $Receiver = $request->request->get("email");
         $client = $clientsRepository->findOneBy(["email" => "ahmedgarci146@gmail.com"]);
         if (!$client || $client == null) {
@@ -47,8 +45,9 @@ class TechnicienFeaturesController extends AbstractController
         }
         $uploadedFile = $request->files->get("file");
         $titre = $request->request->get("title");
-        $userDecodedData = $jwtEncoder->decode($token);
-        $technician = $tech->findOneBy(["id" => $userDecodedData["id"]]);
+    //    $userDecodedData = $jwtEncoder->decode($token);
+        $userId = $helpers->DecodeToken($token);
+        $technician = $tech->findOneBy(["id" => $userId]);
         $rapport = new Rapports();
         $uploadsDirectory = $this->getParameter('upload_directory');
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -63,17 +62,26 @@ class TechnicienFeaturesController extends AbstractController
     }
 
      /**
-     * @Route("/Techniciens/showDemands", name="dbdemande", methods={"GET"})
+     * @Route("/Techniciens/showDemands", name="TechShowDemands", methods={"GET"})
      */
-    public function Show(Request $request, JWTEncoderInterface $jwtEncoder, TechnicienRepository $techRepo, SerializerInterface $serializer, DBSourceRepository $dbSourceRep, ClientsRepository $clientRep): Response
+    public function Show(Request $request, JWTEncoderInterface $jwtEncoder,
+    Helpers $helpers,
+    ClientsRepository $cl,
+     TechnicienRepository $techRepo, 
+     SerializerInterface $serializer, 
+     DBSourceRepository $dbSourceRep, 
+     ClientsRepository $clientRep): Response
     {
         try {
-            
-            $dem = $dbSourceRep->find(["host"=> "aaaaa" ]);
-            // Sérialiser l'objet technicien sans référence circulaire
-            $jsonContent = $serializer->serialize($dem, 'json', ['groups' => 'show_technicien']);
-            
-            return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
+ //           $userCookies = $request->cookies->get("user");
+ //           if (!$userCookies) {
+ //               return new JsonResponse('Unauthorized', Response::HTTP_NOT_FOUND);
+ //           }
+  //          $userId =$helpers->DecodeToken($userCookies);
+            $technicien = $techRepo->findOneBy(["id"=>1]);
+            $TechDemands = $dbSourceRep->findBy(["tech"=>$technicien,'isGenerated'=>false]);
+            $jsonContent = $serializer->serialize($TechDemands, 'json',['groups'=>["dbSource:db_Read","client:userInfo"]]);
+            return new JsonResponse([$jsonContent], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -83,12 +91,6 @@ class TechnicienFeaturesController extends AbstractController
 
 
    
-
-
-
-
-
-
 
 
 

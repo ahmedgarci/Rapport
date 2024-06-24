@@ -18,11 +18,11 @@ class ClientController extends AbstractController
     {
 
         $id = 1;
-        $client = $clientsRepository->find($id);
-    
+        $client = $clientsRepository->find($id);    
         if (!$client) {
             return new JsonResponse(['error' => 'Client not found'], JsonResponse::HTTP_NOT_FOUND);
         }
+        
         $reports = $rapportsRepository->findBy(['client' => $client]);
         $serializedReports = [];
         foreach ($reports as $report) {
@@ -33,8 +33,7 @@ class ClientController extends AbstractController
                 'Date'=>$report->getdate(),
                 'Publisher'=>$report->getTech()
             ];
-        }
-        
+        }        
         return new JsonResponse($serializedReports);
     }
 }

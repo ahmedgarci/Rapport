@@ -27,8 +27,8 @@ class MainController extends AbstractController
     public function index(ClientsRepository $clientsRep, SerializerInterface $serializer ,
                           TechnicienRepository $techRep):JsonResponse
     {
-        $serializedClients = json_decode($serializer->serialize($clientsRep->findAll(), 'json'));
-        $serializedTechs= json_decode($serializer->serialize($techRep->findAll(), 'json'));
+        $serializedClients = json_decode($serializer->serialize($clientsRep->findAll(), 'json',['groups'=>"client:userInfo"]));
+        $serializedTechs= json_decode($serializer->serialize($techRep->findAll(), 'json',['groups'=>"Tech:TechInfo"]));
         return new JsonResponse([
             "Techs"=>$serializedTechs,
             "Clients"=>$serializedClients
