@@ -21,6 +21,8 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use App\Helpers;
 use Doctrine\ORM\EntityManagerInterface;
 
+
+
 class DBreportsController extends AbstractController
 {
     
@@ -56,14 +58,13 @@ class DBreportsController extends AbstractController
             return new JsonResponse('Demande Envoyée');
         } catch (\Exception $e) {
             return new Response('Error : ' . $e->getMessage());
-        }
-    }
+        }}
+
 
 
     /**
      * @Route("/Techniciens/GenererRapportAvecDB", name="dbreport", methods={"POST"})
      */
-
      public function genererRapport(Request $request, Helpers $helpers,
      DBSourceRepository $dbSourceRep,EntityManagerInterface $em,
      ClientsRepository $client, RapportsRepository $rap, 
@@ -90,7 +91,33 @@ class DBreportsController extends AbstractController
              'db_connection' => $databaseOptions,
          ];
          $jasper = new PHPJasper();
-         try {
+        $databaseOptions = [
+            'driver' => $request->get("driver"),
+            'username' => $request->get("username"),
+            'password' => $request->get("password"),
+            'host' => $request->get("host"),
+            'database' => $request->get("database")
+        ];
+        $options = [
+            'format' => ['pdf'],
+            'locale' => 'en',
+            'db_connection' => $databaseOptions,
+            'params' => [
+                'NomDuClient' => "Saidani Hazem",
+                'EmailDuClient' => "saidanihazem022@gmail.com",
+                'NomDuTechnicien' => "Garci Ahmed"
+            ]
+        ];
+
+        $cli = $client->find(23);
+        $techni = $technicien->find(2);
+
+        $rapport = new Rapports();
+        $rapport->setClient($cli)->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))->settitle("Report")->setTech($techni)->setReportPath($newFilename);
+        $rap->add($rapport);
+        $jasper = new PHPJasper;
+
+        try {
             $jasper->process($input, $output, $options)->execute();
             $client = $client->findOneBy(["email"=>$DemandInfo["client"]["email"]]);
             $tech = $technicien->find($helpers->DecodeToken($request->cookies->get("user")));
@@ -118,22 +145,19 @@ class DBreportsController extends AbstractController
 
 
 
-
-
     /**
-     * @Route("/db/csvreport", name="csvReport", methods={"POST"})
+     * @Route("/db/csvreport", name="csvReport")
      */
-    public function generatecsvReport()
+    public function generatecsvReport(ClientsRepository $client , RapportsRepository $rap, TechnicienRepository $technicien): Response
     {
         require __DIR__ . '/../../vendor/autoload.php';
-        $csvdata = getCsvData();
-        $csvJson = json_encode($csvdata);
-
-        $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_world.jrxml';
+        $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_worldTocsv.jrxml';
         $newFilename = uniqid();
         $output = __DIR__ . '/../../public/reports/' . $newFilename;
+       
+        $data = getCsvData();
+        $csvString = csvToString($data);
 
-        $csvdataJson = json_encode($csvdata);
 
         $options = [
             'format' => ['pdf'],
@@ -142,34 +166,96 @@ class DBreportsController extends AbstractController
                 'NomDuClient' => "Saidani Hazem",
                 'EmailDuClient' => "SaidaniHazem022@gmail.com",
                 'NomDuTechnicien' => "Garci Ahmed",
-                'csvData' => $csvdataJson
-            ]
-        ];
+                'contenueCSV' => $csvString
+            ]];
         $jasper = new PHPJasper;
+        
         try {
             echo "Starting report generation process...\n";
             $jasper->process($input, $output, $options)->execute();
-            echo "Report generated successfully.\n";
+
+            $cli = $client->find(23);
+            $techni = $technicien->find(2);
+
+            $rapport = new Rapports();
+            $rapport->setClient($cli)->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))->settitle("Report")->setTech($techni)->setReportPath($newFilename);
+            $rap->add($rapport);
+
+            return new Response("bien genere");
         } catch (\Exception $e) {
-            echo "Error generating report: " . $e->getMessage() . "\n";
-        }
-    }
+            return new Response("eurreur :  ". $e->getMessage()); 
+        }}
 
 
 
 
+        /**
+         * @Route("/db/txtreport", name="txtReport")
+         */
+        public function txtreports(ClientsRepository $client , RapportsRepository $rap, TechnicienRepository $technicien): Response
+        {
+            require __DIR__ . '/../../vendor/autoload.php';
+            $input = __DIR__ . '/../../vendor/geekcom/phpjasper/examples/hello_world_TxT.jrxml';
+            $newFilename = uniqid();
+            $output = __DIR__ . '/../../public/reports/' . $newFilename;
 
-    private function getCsvData(): array
-    {
-        $csvFilePath = '../public/uploads/0eb6eb19ddead5b87a9e25ec4c5a0ecf.csv';
+            $txt = readTxtFile();
+
+            $options = [
+                'format' => ['pdf'],
+                'locale' => 'en',
+                'params' => [
+                    'NomDuClient' => "Saidani Hazem",
+                    'EmailDuClient' => "SaidaniHazem022@gmail.com",
+                    'NomDuTechnicien' => "Garci Ahmed",
+                    'contenueCSV' => $txt
+                ]];
+            
+            $jasper = new PHPJasper;
+            
+            try {
+                echo "Starting report generation process...\n";
+                $jasper->process($input, $output, $options)->execute();
+                $rapport = new Rapports();
+                $cli = $client->find(23);
+            $techni = $technicien->find(2);
+                $rapport->setClient($cli)->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))->settitle("Report")->setTech($techni)->setReportPath($newFilename);
+                $rap->add($rapport);
+
+                return new Response("generer");
+
+        } catch (\Exception $e) {
+            return new Response("euureur :  ". $e->getMessage()); 
+        }}}
+    
+    
+    
+    function getCsvData(): array{
+        $csvFilePath = '../public/uploads/Population.csv';
         $file = fopen($csvFilePath, 'r');
         $csvData = [];
         $headers = fgetcsv($file);
         while (($row = fgetcsv($file)) !== false) {
-            $csvData[] = array_combine($headers, $row);
-        }
+            $csvData[] = array_combine($headers, $row);}
         fclose($file);
         return $csvData;
     }
 
-}
+    function csvToString(array $data): string {
+        $csvString = '';
+        foreach ($data as $row) {
+            $csvString .= implode('     ', $row);}
+        return $csvString;
+    }
+
+    function readTxtFile(): string {
+        $filePath ='../public/uploads/symfony.txt';
+    
+        $fileHandle = fopen($filePath, 'r');
+        $fileContents = '';
+        while (($line = fgets($fileHandle)) !== false) {
+            $fileContents .= $line;
+        }
+        fclose($fileHandle);
+        return $fileContents;
+    }

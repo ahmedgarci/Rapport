@@ -61,6 +61,7 @@ class TechnicienFeaturesController extends AbstractController
         return new JsonResponse("Report Sent To The Specific Client", Response::HTTP_OK);
     }
 
+
      /**
      * @Route("/Techniciens/showDemands", name="TechShowDemands", methods={"GET"})
      */
@@ -84,13 +85,9 @@ class TechnicienFeaturesController extends AbstractController
             return new JsonResponse([$jsonContent], Response::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+      }
     }
 
-
-
-
-   
 
 
 

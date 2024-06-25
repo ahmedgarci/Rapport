@@ -1,0 +1,50 @@
+--/** creation dun projet**/
+symfony new my_project_directory --version="7.0.*" --webapp
+symfony new my_project_directory --version="7.0.*"
+
+
+--/** lancer le serveur **/
+php -S localhost:8000 -t public
+
+--/**make controller**/
+php bin/console make:controller (name)
+
+--/** make list **/
+php bin/console make
+
+
+--/** liste des routes **/
+ php bin/console debug:router
+
+
+--/** creation de table user   **/
+symfony console make:user /** et suivi les etapes**/
+rapport
+
+--/**  modifier une entite         **/
+symfony console make:entity
+
+
+/** connection a la base de donnees **/
+"mysql://root:@127.0.0.1:3306/symph?serverVersion=8.0&charset=utf8mb4"
+
+/**installation de dependances base de donnees **/
+composer require doctrine/doctrine-bundle doctrine/doctrine-migrations-bundle
+
+
+
+/** creation une base de donnees vide selon le lien **/
+php bin/console doctrine:database:create
+
+
+/** creation des table selon les entitys **/
+php bin/console doctrine:schema:update --force
+
+
+
+/**     ajouter l'authentification            **/
+
+symfony console make:auth
+
+/** inscription **/
+symfony console make:reg
