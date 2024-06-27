@@ -68,6 +68,34 @@ class DBSource
      */
     private $isGenerated;
 
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $DateFrom;
+
+    /**
+     * @ORM\Column(type="date",nullable=true)
+     */
+    private $DateTo;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $Column1;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $Column2;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $Column3;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -164,6 +192,66 @@ class DBSource
     public function setIsGenerated(?bool $isGenerated): self
     {
         $this->isGenerated = $isGenerated;
+
+        return $this;
+    }
+
+    public function getDateFrom(): ?\DateTimeInterface
+    {
+        return $this->DateFrom;
+    }
+
+    public function setDateFrom(?\DateTimeInterface $DateFrom): self
+    {
+        $this->DateFrom = $DateFrom;
+
+        return $this;
+    }
+
+    public function getDateTo(): ?\DateTimeInterface
+    {
+        return $this->DateTo;
+    }
+
+    public function setDateTo(\DateTimeInterface $DateTo): self
+    {
+        $this->DateTo = $DateTo;
+
+        return $this;
+    }
+
+    public function getColumn1(): ?string
+    {
+        return $this->Column1;
+    }
+
+    public function setColumn1(?string $Column1): self
+    {
+        $this->Column1 = $Column1;
+
+        return $this;
+    }
+
+    public function getColumn2(): ?string
+    {
+        return $this->Column2;
+    }
+
+    public function setColumn2(?string $Column2): self
+    {
+        $this->Column2 = $Column2;
+
+        return $this;
+    }
+
+    public function getColumn3(): ?string
+    {
+        return $this->Column3;
+    }
+
+    public function setColumn3(?string $Column3): self
+    {
+        $this->Column3 = $Column3;
 
         return $this;
     }

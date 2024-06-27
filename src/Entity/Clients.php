@@ -52,10 +52,16 @@ class Clients implements UserInterface
      */
     private $dBSources;
 
+    /**
+     * @ORM\OneToMany(targetEntity=DataSource::class, mappedBy="client")
+     */
+    private $dataSources;
+
     public function __construct()
     {
         $this->rapports = new ArrayCollection();
         $this->dBSources = new ArrayCollection();
+        $this->dataSources = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -165,7 +171,6 @@ class Clients implements UserInterface
     public function removeDBSource(DBSource $dBSource): self
     {
         if ($this->dBSources->removeElement($dBSource)) {
-            // set the owning side to null (unless already changed)
             if ($dBSource->getClientId() === $this) {
                 $dBSource->setClientId(null);
             }
@@ -173,4 +178,6 @@ class Clients implements UserInterface
 
         return $this;
     }
+
+   
 }

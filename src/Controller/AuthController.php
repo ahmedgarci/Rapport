@@ -45,8 +45,7 @@ class AuthController extends AbstractController
         }
         $payload = [
             'username' => $Exists["user"]->getUsername(),
-            'id' => $Exists["user"]->getId(),  // Inclure l'ID de l'utilisateur dans le payload
-            // Autres informations pertinentes à inclure...
+            'id' => $Exists["user"]->getId(),  
         ];
         $token = $JWTManager->create($Exists['user'],$payload);
         $response = new JsonResponse($Exists['type']);
@@ -65,7 +64,25 @@ class AuthController extends AbstractController
         return $response;
 
     }
-
+     /**
+     * @Route("/auth/getCurrentUser", name="get_Current_User")
+     */
+    public function CurrentUser(
+        JWTEncoderInterface $JWTEncoder,
+        Request $request,
+        JWTTokenManagerInterface $JWTManager,
+        Helpers $helpers,
+    ): JsonResponse
+    {
+        $Usercookie = $request->cookies->get("user");
+        if(!$Usercookie){
+            return new JsonResponse("not found ");
+        }
+        $userId = $helpers->DecodeToken($Usercookie);
+        $user = $helpers->searchUser(null,$userId);
+        return new JsonResponse($user["type"]);
+        
+    }
 
 
 

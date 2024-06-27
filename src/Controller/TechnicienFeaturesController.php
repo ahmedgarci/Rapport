@@ -39,13 +39,12 @@ class TechnicienFeaturesController extends AbstractController
             return new JsonResponse("Unauthorized", Response::HTTP_UNAUTHORIZED);
         }
         $Receiver = $request->request->get("email");
-        $client = $clientsRepository->findOneBy(["email" => "ahmedgarci146@gmail.com"]);
+        $client = $clientsRepository->findOneBy(["email" =>$Receiver]);
         if (!$client || $client == null) {
             return new JsonResponse('client introuvable', Response::HTTP_BAD_REQUEST);
         }
         $uploadedFile = $request->files->get("file");
         $titre = $request->request->get("title");
-    //    $userDecodedData = $jwtEncoder->decode($token);
         $userId = $helpers->DecodeToken($token);
         $technician = $tech->findOneBy(["id" => $userId]);
         $rapport = new Rapports();
@@ -53,10 +52,8 @@ class TechnicienFeaturesController extends AbstractController
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $newFilename = uniqid() . '.' . $uploadedFile->guessExtension();
         $uploadedFile->move($uploadsDirectory, $newFilename);
-        $rapport->setTitle($titre);
-        $rapport->setClient($client);
-        $rapport->setTech($technician);
-        $rapport->setReportPath($newFilename);
+        $rapport->setTitle($titre)->setClient($client)->setTech($technician)->setReportPath($newFilename)
+        ->setDate(date('d/m/Y H:i:s'));
         $rapportsRepository->add($rapport, true);
         return new JsonResponse("Report Sent To The Specific Client", Response::HTTP_OK);
     }
@@ -74,12 +71,12 @@ class TechnicienFeaturesController extends AbstractController
      ClientsRepository $clientRep): Response
     {
         try {
- //           $userCookies = $request->cookies->get("user");
- //           if (!$userCookies) {
- //               return new JsonResponse('Unauthorized', Response::HTTP_NOT_FOUND);
- //           }
-  //          $userId =$helpers->DecodeToken($userCookies);
-            $technicien = $techRepo->findOneBy(["id"=>1]);
+            $userCookies = $request->cookies->get("user");
+            if (!$userCookies) {
+                return new JsonResponse('Unauthorized', Response::HTTP_NOT_FOUND);
+            }
+            $userId =$helpers->DecodeToken($userCookies);
+            $technicien = $techRepo->findOneBy(["id"=>$userId]);
             $TechDemands = $dbSourceRep->findBy(["tech"=>$technicien,'isGenerated'=>false]);
             $jsonContent = $serializer->serialize($TechDemands, 'json',['groups'=>["dbSource:db_Read","client:userInfo"]]);
             return new JsonResponse([$jsonContent], Response::HTTP_OK);
