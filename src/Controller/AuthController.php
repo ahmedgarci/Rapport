@@ -32,8 +32,6 @@ class AuthController extends AbstractController
         AdminRepository $adminRepository
     ): JsonResponse
     {
-        //$admin->setPassword("ahmed")->setEmail("garci@gmail.com")
-        //    ->setUsername("aaa");
         $userData = json_decode($request->getContent(), true);
         $Exists = $helpers->SearchUser($userData["email"],null);
         if(!$Exists){
@@ -41,8 +39,7 @@ class AuthController extends AbstractController
         }
         $isValid = $passwordEncoder->isPasswordValid($Exists["user"],$userData["password"]);
         if(!$isValid){
-            return  new JsonResponse("Invalid Credentials",JsonResponse::HTTP_UNAUTHORIZED);
-        }
+            return  new JsonResponse("Invalid Credentials",JsonResponse::HTTP_UNAUTHORIZED);}
         $payload = [
             'username' => $Exists["user"]->getUsername(),
             'id' => $Exists["user"]->getId(),  
@@ -84,6 +81,20 @@ class AuthController extends AbstractController
         
     }
 
+      /**
+     * @Route("/auth/Logout", name="Logout_User")
+     */
+    public function logoutUser(Request $request): JsonResponse
+    {
+        $userCookie = $request->cookies->get('user');
+        if ($userCookie) {
+            $response = new JsonResponse();
+            $response->headers->clearCookie('user');
+            return $response;
+        }
+    
+        return new JsonResponse(['success' => false, 'message' => 'No user cookie found.']);
+    }
 
 
 

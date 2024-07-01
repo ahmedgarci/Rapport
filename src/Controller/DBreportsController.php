@@ -39,7 +39,7 @@ class DBreportsController extends AbstractController
         $requestData = json_decode($request->getContent(),true);
         $technicien = $techRepo->findOneBy(["email"=> $requestData["emailTech"]]);
         if(!$technicien){
-            return new JsonResponse('Technicien n existe pas !');            
+            return new JsonResponse('Technicien n existe pas !',Response::HTTP_NOT_FOUND);            
         }
         $ClientId = $helpers->DecodeToken($token);
         try {
@@ -49,8 +49,10 @@ class DBreportsController extends AbstractController
                 ->setUsername($requestData["username"])
                 ->setPassword($requestData["password"])
                 ->setHost($requestData["host"])
-                ->setDB($requestData["driver"])
+                ->setDB($requestData["DB"])
                 ->setClient($client)
+                ->setTableDesired($requestData['table'])
+                ->setIsGenerated(false)
                 ->setColumn1($requestData["columns"][0])
                 ->setColumn2($requestData["columns"][1])
                 ->setColumn3($requestData["columns"][2])
@@ -66,7 +68,6 @@ class DBreportsController extends AbstractController
     /**
      * @Route("/Techniciens/GenererRapportAvecDB", name="dbreport", methods={"POST"})
      */
-
      public function genererRapport(Request $request, Helpers $helpers,
      DBSourceRepository $dbSourceRep,EntityManagerInterface $em,
      ClientsRepository $client, RapportsRepository $rap, 
@@ -77,7 +78,6 @@ class DBreportsController extends AbstractController
          $newFilename = uniqid();
          $output = __DIR__ . '/../../public/reports/' . $newFilename;
         
-
          $DemandInfo = json_decode($request->getContent(), true)["DBInfo"];
          $tech = $technicien->find($helpers->DecodeToken($request->cookies->get("user")));
          $databaseOptions = [
@@ -87,23 +87,23 @@ class DBreportsController extends AbstractController
              'host' => $DemandInfo["host"],
              'database' => $DemandInfo["DB"]
          ];
- 
-         $options = [
-            'format' => ['pdf'],
-            'locale' => 'en',
-            'db_connection' => $databaseOptions,
-            'params' => [
-                'NomDuClient' => $DemandInfo['client']['username'],
-                'EmailDuClient' => $DemandInfo['client']['email'],
-                'NomDuTechnicien' => $tech->getUsername(),
-                'inclureField1' => $DemandInfo['Column1']!==null ? 1 : 0,
-                'inclureField2' => $DemandInfo['Column2']!==null ? 1 : 0,
-                'inclureField3' => $DemandInfo['Column3']!==null ? 1 : 0,
-                'field1'=>$DemandInfo["Column1"],
-                'field2'=>$DemandInfo["Column2"],                
-                'field3'=>$DemandInfo["Column3"],                
+            $options = [
+                'format' => ['pdf'],
+                'locale' => 'en',
+                'db_connection' => $databaseOptions,
+                'params' => [
+                    'NomDuClient' => $DemandInfo['client']['username'],
+                    'EmailDuClient' => $DemandInfo['client']['email'],
+                    'NomDuTechnicien' => $tech->getUsername(),
+                    'inclureField1' => $DemandInfo['Column1'] !== null ? 1 : 0,
+                    'inclureField2' => $DemandInfo['Column2'] !== null ? 1 : 0,
+                    'inclureField3' => $DemandInfo['Column3'] !== null ? 1 : 0,
+                    'field1' => $DemandInfo['Column1'],
+                    'field2' => $DemandInfo['Column2'],
+                    'field3' => $DemandInfo['Column3'],
+                    'table' => $DemandInfo['TableDesired']
                 ]
-        ];
+            ];
          
          $jasper = new PHPJasper();
          try {
@@ -112,7 +112,7 @@ class DBreportsController extends AbstractController
             $rapport = new Rapports();
             $rapport->setClient($client)
             ->setDate(new \DateTime("now", new \DateTimeZone("Africa/Tunis")))
-            ->setReportPath($newFilename)
+            ->setReportPath($newFilename.".pdf")
             ->settitle("Report")->setTech($tech);
             $rap->add($rapport,true);
             $ClientDbsource = $dbSourceRep->findOneBy(["id"=>$DemandInfo["id"]]);
