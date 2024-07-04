@@ -11,7 +11,7 @@ use App\Repository\ClientsRepository;
 use App\Repository\DBSourceRepository;
 use App\Repository\DataSourceRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use PDO;
 use App\Helpers;
 
 class ClientController extends AbstractController
@@ -42,26 +42,53 @@ class ClientController extends AbstractController
         }        
         return new JsonResponse($serializedReports);
     }
+    /**
+     * @Route("/Client/getTables", name="GetMyTables", methods={"POST"})
+     */
+     public function getTables(
+        Request $request 
+    ){
+        $DemandInfo = json_decode($request->getContent(), true);
+        $servername = $DemandInfo['host'];
+        $username = $DemandInfo["username"];
+        $password = $DemandInfo["password"];
+        $dbname = $DemandInfo["DB"];
+        
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare("SHOW TABLES");
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            return new JsonResponse($result);
+        } catch(PDOException $e) {
+        return new JsonResponse($e->getMessage());
+        }          
+    }
 
-//      /**
-//     * @Route("/Client/GetMySources", name="get_Sources")
-//     */
-//    public function GetMySources(DataSourceRepository $dbRepository,
-//     ClientsRepository $clientsRepository,
-//    Request $request,Helpers $helpers,
-//    DataSourceRepository $FilesRepository
-//    ): JsonResponse
-//    {
-//        $clientCookie = $request->cookies->get("user");
-//        if (!$clientCookie) {
-//            return new JsonResponse("unauthorized");
-//        }
-//        $userId = $helpers->DecodeToken($clientCookie);     
-//        $clientEntity = $clientsRepository->find($userId);
-//        $dbSources = $dbRepository->findBy(["client"=>$clientEntity]);
-//        $filesSource = $FilesRepository->findBy(["client"=>$clientEntity]);
-//        return new JsonResponse([$filesSource,$dbSources]);
-//    }
+    /**
+     * @Route("/Client/getColNames", name="GetColNames", methods={"POST"})
+     */
+    public function getColNames(
+        Request $request 
+    ){
+        $DemandInfo = json_decode($request->getContent(), true);
+        $servername = $DemandInfo['host'];
+        $username = $DemandInfo["username"];
+        $password = $DemandInfo["password"];
+        $dbname = $DemandInfo["DB"];
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $requette = "describe ". $DemandInfo["table"];
+            $stmt = $conn->prepare($requette);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            return new JsonResponse($result);
+        } catch(PDOException $e) {
+        return new JsonResponse($e->getMessage());
+        }          
+    }
 
 
 

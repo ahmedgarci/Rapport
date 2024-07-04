@@ -86,8 +86,4 @@ class TechnicienFeaturesController extends AbstractController
     }
 
 
-
-
-
-
 }

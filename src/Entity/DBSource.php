@@ -96,6 +96,36 @@ class DBSource
      */
     private $Column3;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $Port;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $TableDesired;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $Conditions;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $operateur;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"dbSource:db_Read"})
+     */
+    private $fieldChoosedFroCondition;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -252,6 +282,66 @@ class DBSource
     public function setColumn3(?string $Column3): self
     {
         $this->Column3 = $Column3;
+
+        return $this;
+    }
+
+    public function getPort(): ?int
+    {
+        return $this->Port;
+    }
+
+    public function setPort(?int $Port): self
+    {
+        $this->Port = $Port;
+
+        return $this;
+    }
+
+    public function getTableDesired(): ?string
+    {
+        return $this->TableDesired;
+    }
+
+    public function setTableDesired(?string $TableDesired): self
+    {
+        $this->TableDesired = $TableDesired;
+
+        return $this;
+    }
+
+    public function getConditions(): ?string
+    {
+        return $this->Conditions;
+    }
+
+    public function setConditions(?string $Conditions): self
+    {
+        $this->Conditions = $Conditions;
+
+        return $this;
+    }
+
+    public function getOperateur(): ?string
+    {
+        return $this->operateur;
+    }
+
+    public function setOperateur(?string $operateur): self
+    {
+        $this->operateur = $operateur;
+
+        return $this;
+    }
+
+    public function getFieldChoosedFroCondition(): ?string
+    {
+        return $this->fieldChoosedFroCondition;
+    }
+
+    public function setFieldChoosedFroCondition(?string $fieldChoosedFroCondition): self
+    {
+        $this->fieldChoosedFroCondition = $fieldChoosedFroCondition;
 
         return $this;
     }
